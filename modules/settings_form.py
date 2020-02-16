@@ -94,6 +94,44 @@ class FreeButton(StatusButton):
         self.rect.x, self.rect.y = Game._coord((25, 150))
 
 
+class WindowModeButton(Buttons):
+    def __init__(self, Game, *group):
+        self.status = Game.fullscrean
+        super().__init__(Game, *group)
+
+    def update(self, *args):
+        super().update(*args)
+        self.status = args[1].fullscrean == self.const
+
+    def click(self, *args):
+        args[1].fullscrean = self.const
+        args[1].set_mode()
+        args[1].callbacks.append(modules.settings_form.settings_form)
+        args[1].running = False
+
+
+class OnWindowButton(WindowModeButton):
+    def __init__(self, Game, *group):
+        self.const = False
+        self.image_orig = Game.load_image('images/buttons/on_window.png',
+                                          -1, Game._coord((150, None)), False)
+        self.image_gray = Game.load_image('images/buttons/on_window_gray.png',
+                                          -1, Game._coord((150, None)), False)
+        super().__init__(Game, *group)
+        self.rect.x, self.rect.y = Game._coord((25, 250))
+
+
+class FullScreenButton(WindowModeButton):
+    def __init__(self, Game, *group):
+        self.const = True
+        self.image_orig = Game.load_image('images/buttons/fullscreen.png',
+                                          -1, Game._coord((150, None)), False)
+        self.image_gray = Game.load_image('images/buttons/fullscreen_gray.png',
+                                          -1, Game._coord((150, None)), False)
+        super().__init__(Game, *group)
+        self.rect.x, self.rect.y = Game._coord((25, 300))
+
+
 class TaxiButton(Buttons):
     def __init__(self, Game, *group):
         self.status = Game.firm == self.const
@@ -203,6 +241,9 @@ def settings_form(Game):
     BackToMenuButton(Game, Game.all_sprites)
     ContestButton(Game, Game.all_sprites)
     FreeButton(Game, Game.all_sprites)
+    Game.all_sprites.add(Label(Game).print('ОТОБРАЖЕНИЕ').move(18, 210))
+    OnWindowButton(Game, Game.all_sprites)
+    FullScreenButton(Game, Game.all_sprites)
     Game.all_sprites.add(Label(Game).print('ФИРМА').move(260, 60))
     YandexTaxiButton(Game, Game.all_sprites)
     UberButton(Game, Game.all_sprites)
