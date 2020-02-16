@@ -33,6 +33,7 @@ class Tile(pygame.sprite.Sprite):
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.image = Game.tile_images[tile_type]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(
             Game._coord((
                 Game.CELL_SIZE[0] * (pos_x - pos_y / 2),
@@ -118,6 +119,7 @@ class Car(pygame.sprite.Sprite):
                                                -1, Game._coord((Game.CELL_SIZE[0], Game.CELL_SIZE[1])), False))
         self.direction = Car.BOTTOM_LEFT
         self.image = self.images[self.direction]
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(
             Game._coord((
                 Game.CELL_SIZE[0] * (pos_x - pos_y / 2),
@@ -166,6 +168,7 @@ class Car(pygame.sprite.Sprite):
     def set_direction(self, direction):
         self.direction = direction
         self.image = self.images[direction]
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 class CarPlayer(Car):
@@ -226,7 +229,30 @@ class CarPlayer(Car):
         self.dy *= self.SPEED_COEFF ** (1 / self.game.fps)
         if self.running:
             self.go()
-        # TODO
+        if pygame.sprite.spritecollide(self, self.game.border_top_left_sprites,
+                                       False, pygame.sprite.collide_mask):
+            if self.dy < 0:
+                self.dy = 0
+            if self.dx < 0:
+                self.dx = 0
+        if pygame.sprite.spritecollide(self, self.game.border_top_right_sprites,
+                                       False, pygame.sprite.collide_mask):
+            if self.dy < 0:
+                self.dy = 0
+            if self.dx > 0:
+                self.dx = 0
+        if pygame.sprite.spritecollide(self, self.game.border_bottom_right_sprites,
+                                       False, pygame.sprite.collide_mask):
+            if self.dy > 0:
+                self.dy = 0
+            if self.dx > 0:
+                self.dx = 0
+        if pygame.sprite.spritecollide(self, self.game.border_bottom_left_sprites,
+                                       False, pygame.sprite.collide_mask):
+            if self.dy > 0:
+                self.dy = 0
+            if self.dx < 0:
+                self.dx = 0
         self.x += self.dx
         self.y += self.dy
         self.rect.x += int(self.x)
@@ -293,7 +319,7 @@ class Board:
                         RoadParkingTile(self.game, None, x, y).add_borders(borders)
                     elif self.get(y, x) == '*':
                         RoadAroundBuildingTile(self.game, None, x, y).add_borders(borders)
-        new_player = CarPlayer(self.game, *free_cells[0])
+        new_player = CarPlayer(self.game, -1, -1)
         return new_player
 
 
