@@ -172,6 +172,8 @@ class Car(pygame.sprite.Sprite):
 
 
 class CarPlayer(Car):
+    REBOUND_COEFF = 0.3
+
     def __init__(self, Game, pos_x, pos_y):
         super().__init__(Game, Game.firm, pos_x, pos_y)
         self.dx = 0
@@ -232,27 +234,27 @@ class CarPlayer(Car):
         if pygame.sprite.spritecollide(self, self.game.border_top_left_sprites,
                                        False, pygame.sprite.collide_mask):
             if self.dy < 0:
-                self.dy = 0
+                self.dy *= - self.REBOUND_COEFF
             if self.dx < 0:
-                self.dx = 0
+                self.dx *= - self.REBOUND_COEFF
         if pygame.sprite.spritecollide(self, self.game.border_top_right_sprites,
                                        False, pygame.sprite.collide_mask):
             if self.dy < 0:
-                self.dy = 0
+                self.dy *= - self.REBOUND_COEFF
             if self.dx > 0:
-                self.dx = 0
+                self.dx *= - self.REBOUND_COEFF
         if pygame.sprite.spritecollide(self, self.game.border_bottom_right_sprites,
                                        False, pygame.sprite.collide_mask):
             if self.dy > 0:
-                self.dy = 0
+                self.dy *= - self.REBOUND_COEFF
             if self.dx > 0:
-                self.dx = 0
+                self.dx *= - self.REBOUND_COEFF
         if pygame.sprite.spritecollide(self, self.game.border_bottom_left_sprites,
                                        False, pygame.sprite.collide_mask):
             if self.dy > 0:
-                self.dy = 0
+                self.dy *= - self.REBOUND_COEFF
             if self.dx < 0:
-                self.dx = 0
+                self.dx *= - self.REBOUND_COEFF
         self.x += self.dx
         self.y += self.dy
         self.rect.x += int(self.x)
