@@ -291,6 +291,8 @@ class Board:
                     BuildTile(self.game, 'build_1', x, y)
                 elif self.get(y, x) == '.':
                     BackTile(self.game, None, x, y)
+                elif self.get(y, x) == 'X':
+                    pass
                 else:
                     no_roads = '#X.'
                     no_roads_and_visible = '.'
@@ -312,7 +314,7 @@ class Board:
                             self.get(y - 1, x - 1) in no_roads_and_visible
                         ),
                     ]
-                    free_cells.append((y, x))
+                    free_cells.append((x, y))
                     if self.get(y, x) == ' ':
                         RoadTile(self.game, None, x, y).add_borders(borders)
                     elif self.get(y, x) == 'П':
@@ -320,7 +322,6 @@ class Board:
                     elif self.get(y, x) == '*':
                         RoadAroundBuildingTile(self.game, None, x, y).add_borders(borders)
         random.shuffle(free_cells)
-        print(free_cells[0])
         new_player = CarPlayer(self.game, *free_cells[0])
         return new_player
 
