@@ -1,5 +1,4 @@
 import os
-from win32api import GetSystemMetrics
 import pygame
 from modules.settings import SETTINGS
 from modules.functions import Functions
@@ -20,11 +19,6 @@ class Game(SETTINGS, Functions):
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
 loader(Game)
-if Game.fullscrean:
-    Game.real_width = GetSystemMetrics(0)
-    Game.real_height = GetSystemMetrics(1)
-    Game.screen = pygame.display.set_mode(Game.size(), flags=pygame.FULLSCREEN)
-else:
-    Game.screen = pygame.display.set_mode((Game.width, Game.height))
+Game.set_mode()
 pygame.display.set_caption('ГоняйТакси')
 menu(Game)

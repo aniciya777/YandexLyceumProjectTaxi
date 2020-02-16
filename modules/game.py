@@ -53,10 +53,13 @@ class Car(pygame.sprite.Sprite):
     TOP_RIGHT = 8
     BOTTOM_LEFT = 0
     BOTTOM_RIGHT = 12
+    SPEED_COEFF = 0.2
+    SPEED_ADD = 0.05
 
     def __init__(self, Game, firm, pos_x, pos_y):
         super().__init__(Game.all_sprites, Game.rel_sprites)
         self.game = Game
+        self.speed_add = self.SPEED_ADD * Game.CELL_SIZE[0]
         self.color = self.get_color(firm)
         s = self.get_index()
         self.tile_type = self.get_type()
@@ -75,6 +78,8 @@ class Car(pygame.sprite.Sprite):
             ))
         )
         self.rect.y -= self.rect.h - Game.CELL_SIZE[1]
+        self.x = self.rect.x
+        self.y = self.rect.y
 
     def get_color(self, firm):
         if firm == 0:  # 'Яндекс.Такси'
@@ -119,6 +124,9 @@ class Car(pygame.sprite.Sprite):
 class CarPlayer(Car):
     def __init__(self, Game, pos_x, pos_y):
         super().__init__(Game, Game.firm, pos_x, pos_y)
+        self.dx = 0
+        self.dy = 0
+        self.running = False
 
     def go_top(self):
         if self.direction == self.BOTTOM_LEFT:
@@ -143,6 +151,39 @@ class CarPlayer(Car):
             self.set_direction(self.TOP_RIGHT)
         elif self.direction == self.BOTTOM_LEFT:
             self.set_direction(self.BOTTOM_RIGHT)
+
+    def run(self):
+        self.running = True
+
+    def stop(self):
+        self.running = False
+
+    def go(self):
+        if self.direction == self.TOP_LEFT:
+            self.dx -= (self.speed_add / self.game.fps)
+            self.dy -= (self.speed_add / self.game.fps) / 2
+        elif self.direction == self.TOP_RIGHT:
+            self.dx += (self.speed_add / self.game.fps)
+            self.dy -= (self.speed_add / self.game.fps) / 2
+        elif self.direction == self.BOTTOM_LEFT:
+            self.dx -= (self.speed_add / self.game.fps)
+            self.dy += (self.speed_add / self.game.fps) / 2
+        elif self.direction == self.BOTTOM_RIGHT:
+            self.dx += (self.speed_add / self.game.fps)
+            self.dy += (self.speed_add / self.game.fps) / 2
+
+    def update(self, *args):
+        self.dx *= self.SPEED_COEFF ** (1 / self.game.fps)
+        self.dy *= self.SPEED_COEFF ** (1 / self.game.fps)
+        if self.running:
+            self.go()
+        # TODO
+        self.x += self.dx
+        self.y += self.dy
+        self.rect.x += int(self.x)
+        self.rect.y += int(self.y)
+        self.x -= int(self.x)
+        self.y -= int(self.y)
 
 
 class CarBot(Car):
@@ -226,6 +267,8 @@ def game(Game):
     Game.rel_sprites.empty()
     Game.level = Game.get_level()
     Game.board = Board(Game)
+    player1 = Game.board.player
+    player2 = Game.board.player
 
     Game.running = True
     while Game.running:
@@ -238,13 +281,32 @@ def game(Game):
                     Game.running = False
                     Game.callbacks.append(modules.menu.menu)
                 elif event.key == pygame.K_UP:
-                    Game.board.player.go_top()
+                    player1.go_top()
                 elif event.key == pygame.K_DOWN:
-                    Game.board.player.go_bottom()
+                    player1.go_bottom()
                 elif event.key == pygame.K_LEFT:
-                    Game.board.player.go_left()
+                    player1.go_left()
                 elif event.key == pygame.K_RIGHT:
-                    Game.board.player.go_right()
+                    player1.go_right()
+                elif event.key == pygame.K_w:
+                    player2.go_top()
+                elif event.key == pygame.K_s:
+                    player2.go_bottom()
+                elif event.key == pygame.K_a:
+                    player2.go_left()
+                elif event.key == pygame.K_d:
+                    player2.go_right()
+            if event.type == pygame.KEYDOWN or event.type == pygame.KEYUP:
+                if event.key == pygame.K_RSHIFT:
+                    if event.type == pygame.KEYDOWN:
+                        player1.run()
+                    else:
+                        player1.stop()
+                elif event.key == pygame.K_LSHIFT:
+                    if event.type == pygame.KEYDOWN:
+                        player2.run()
+                    else:
+                        player2   .stop()
         Game.update(event)
         # изменяем ракурс камеры
         camera.update(Game.board.player);

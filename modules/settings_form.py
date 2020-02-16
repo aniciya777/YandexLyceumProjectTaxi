@@ -12,7 +12,7 @@ class Label(pygame.sprite.Sprite):
 
     def print(self, text, size=22):
         size = self.game._coord((size, size))[0]
-        self.font = pygame.font.Font('data/fonts/Roboto-Medium.ttf', size)
+        self.font = pygame.font.Font('data/fonts/Roboto-Medium.ttf', round(size))
         self.image = self.font.render(text, 1, self.color)
         self.rect = self.image.get_rect()
         return self

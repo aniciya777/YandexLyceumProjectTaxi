@@ -1,6 +1,7 @@
 import os
 import pygame
 import numpy
+from win32api import GetSystemMetrics
 
 class Functions:
     @staticmethod
@@ -105,3 +106,12 @@ class Functions:
         max_width = max(map(len, level_map))
         # дополняем каждую строку пустыми клетками ('.')
         return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+
+    @classmethod
+    def set_mode(cls):
+        if cls.fullscrean:
+            cls.real_width = GetSystemMetrics(0)
+            cls.real_height = GetSystemMetrics(1)
+            cls.screen = pygame.display.set_mode(cls.size(), flags=pygame.FULLSCREEN)
+        else:
+            cls.screen = pygame.display.set_mode((cls.width, cls.height))
