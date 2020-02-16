@@ -172,7 +172,7 @@ class Car(pygame.sprite.Sprite):
 
 
 class CarPlayer(Car):
-    REBOUND_COEFF = 0.3
+    REBOUND_COEFF = 0.2
 
     def __init__(self, Game, pos_x, pos_y):
         super().__init__(Game, Game.firm, pos_x, pos_y)
