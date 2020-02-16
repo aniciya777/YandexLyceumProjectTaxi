@@ -10,7 +10,7 @@ class SETTINGS:
         'Rutaxi',
         'Maxim'
     ]
-    FPS_COEFF = 0.2
+    FPS_COEFF = 0.05
     CELL_SIZE = 100
     CELL_SIZE = (CELL_SIZE, CELL_SIZE * 0.5)
 

@@ -3,6 +3,29 @@ import modules
 import random
 
 
+class Label(pygame.sprite.Sprite):
+    def __init__(self, Game, *args):
+        super().__init__(*args)
+        self.color = pygame.Color(255, 255, 2)
+        self.image = pygame.Surface((0, 0))
+        self.rect = pygame.Rect(0, 0, 0, 0)
+        self.game = Game
+
+    def print(self, text, size=None):
+        self.size = size
+        if size is None:
+            self.size = 22
+        self.size = self.game._coord((self.size, self.size))[0]
+        self.font = pygame.font.Font('data/fonts/Roboto-Medium.ttf', round(self.size))
+        self.image = self.font.render(text, 1, self.color)
+        self.rect = self.image.get_rect()
+        return self
+
+    def move(self, x, y):
+        self.rect.x, self.rect.y = self.game._coord((x, y))
+        return self
+
+
 class Tile(pygame.sprite.Sprite):
     def __init__(self, Game, tile_type, pos_x, pos_y):
         super().__init__(Game.all_sprites, Game.rel_sprites)
@@ -159,18 +182,20 @@ class CarPlayer(Car):
         self.running = False
 
     def go(self):
+        sp_add = self.speed_add / self.game.fps
+        sp_add = self.game._coord((sp_add, None))[0]
         if self.direction == self.TOP_LEFT:
-            self.dx -= (self.speed_add / self.game.fps)
-            self.dy -= (self.speed_add / self.game.fps) / 2
+            self.dx -= sp_add
+            self.dy -= sp_add / 2
         elif self.direction == self.TOP_RIGHT:
-            self.dx += (self.speed_add / self.game.fps)
-            self.dy -= (self.speed_add / self.game.fps) / 2
+            self.dx += sp_add
+            self.dy -= sp_add / 2
         elif self.direction == self.BOTTOM_LEFT:
-            self.dx -= (self.speed_add / self.game.fps)
-            self.dy += (self.speed_add / self.game.fps) / 2
+            self.dx -= sp_add
+            self.dy += sp_add / 2
         elif self.direction == self.BOTTOM_RIGHT:
-            self.dx += (self.speed_add / self.game.fps)
-            self.dy += (self.speed_add / self.game.fps) / 2
+            self.dx += sp_add
+            self.dy += sp_add / 2
 
     def update(self, *args):
         self.dx *= self.SPEED_COEFF ** (1 / self.game.fps)
@@ -269,6 +294,7 @@ def game(Game):
     Game.board = Board(Game)
     player1 = Game.board.player
     player2 = Game.board.player
+    fps_label = Label(Game, Game.all_sprites)
 
     Game.running = True
     while Game.running:
@@ -306,7 +332,8 @@ def game(Game):
                     if event.type == pygame.KEYDOWN:
                         player2.run()
                     else:
-                        player2   .stop()
+                        player2.stop()
+        fps_label.print(str(round(Game.fps_real)), 15).move(5, 380)
         Game.update(event)
         # изменяем ракурс камеры
         camera.update(Game.board.player);
