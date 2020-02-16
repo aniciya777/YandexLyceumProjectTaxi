@@ -122,8 +122,8 @@ class Car(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect().move(
             Game._coord((
-                Game.CELL_SIZE[0] * (pos_x - pos_y / 2),
-                Game.CELL_SIZE[1] * pos_y / 2
+                Game.CELL_SIZE[0] * (pos_x - pos_y / 2) / 2,
+                Game.CELL_SIZE[1] * pos_y / 2 / 2
             ))
         )
         self.rect.y -= self.rect.h - Game.CELL_SIZE[1]
@@ -312,14 +312,16 @@ class Board:
                             self.get(y - 1, x - 1) in no_roads_and_visible
                         ),
                     ]
-                    free_cells.append((x, y))
+                    free_cells.append((y, x))
                     if self.get(y, x) == ' ':
                         RoadTile(self.game, None, x, y).add_borders(borders)
                     elif self.get(y, x) == 'П':
                         RoadParkingTile(self.game, None, x, y).add_borders(borders)
                     elif self.get(y, x) == '*':
                         RoadAroundBuildingTile(self.game, None, x, y).add_borders(borders)
-        new_player = CarPlayer(self.game, -1, -1)
+        random.shuffle(free_cells)
+        print(free_cells[0])
+        new_player = CarPlayer(self.game, *free_cells[0])
         return new_player
 
 
