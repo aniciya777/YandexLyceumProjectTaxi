@@ -55,6 +55,11 @@ class BorderTile(Tile):
         elif tile_type == 'border_top_right':
             group = Game.border_top_right_sprites
         group.add(self)
+        if not visible:
+            self.image = self.image.convert()
+            colorkey = self.image.get_at((0, 0))
+            self.image.set_colorkey(colorkey)
+            self.image.set_alpha(0)
 
 
 class BackTile(Tile):
@@ -287,8 +292,10 @@ class Board:
         self.board = Game.load_level(Game.level)
         self.width = len(self.board[0])
         self.height = len(self.board)
-        self.player = self.generate_level()
         self.cell_size = Game.CELL_SIZE
+        self.start_cells = []
+        self.end_cells = []
+        self.player = self.generate_level()
 
     def get(self, row, col):
         if not (0 <= row < self.height):
@@ -309,7 +316,7 @@ class Board:
                     pass
                 else:
                     no_roads = '#X.'
-                    no_roads_and_visible = '.'
+                    no_roads_and_visible = '.X'
                     borders = [
                         (
                             self.get(y - 1, x) in no_roads,
@@ -333,8 +340,11 @@ class Board:
                         RoadTile(self.game, None, x, y).add_borders(borders)
                     elif self.get(y, x) == 'П':
                         RoadParkingTile(self.game, None, x, y).add_borders(borders)
+                        self.end_cells.append((x, y))
                     elif self.get(y, x) == '*':
                         RoadAroundBuildingTile(self.game, None, x, y).add_borders(borders)
+                        self.end_cells.append((x, y))
+                        self.start_cells.append((x, y))
         random.shuffle(free_cells)
         new_player = CarPlayer(self.game, *free_cells[0])
         return new_player
