@@ -29,6 +29,9 @@ class Label(pygame.sprite.Sprite):
 class Tile(pygame.sprite.Sprite):
     def __init__(self, Game, tile_type, pos_x, pos_y):
         super().__init__(Game.all_sprites, Game.rel_sprites)
+        self.game = Game
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.image = Game.tile_images[tile_type]
         self.rect = self.image.get_rect().move(
             Game._coord((
@@ -37,6 +40,20 @@ class Tile(pygame.sprite.Sprite):
             ))
         )
         self.rect.y -= self.rect.h - Game.CELL_SIZE[1]
+
+
+class BorderTile(Tile):
+    def __init__(self, Game, tile_type, pos_x, pos_y, visible=True):
+        super().__init__(Game, tile_type, pos_x, pos_y)
+        if tile_type == 'border_bottom_left':
+            group = Game.border_bottom_left_sprites
+        elif tile_type == 'border_bottom_right':
+            group = Game.border_bottom_right_sprites
+        elif tile_type == 'border_top_left':
+            group = Game.border_top_left_sprites
+        elif tile_type == 'border_top_right':
+            group = Game.border_top_right_sprites
+        group.add(self)
 
 
 class BackTile(Tile):
@@ -50,11 +67,18 @@ class BuildTile(BackTile):
     def __init__(self, Game, tile_type, pos_x, pos_y):
         super().__init__(Game, tile_type, pos_x, pos_y)
 
+
 class RoadTile(Tile):
     def __init__(self, Game, tile_type, pos_x, pos_y):
         if tile_type is None:
             tile_type = random.choice(['road_1'])
         super().__init__(Game, tile_type, pos_x, pos_y)
+
+    def add_borders(self, borders):
+        lst = 'border_top_right', 'border_bottom_right', 'border_bottom_left', 'border_top_left'
+        for i, tp in enumerate(lst):
+            if borders[i][0]:
+                BorderTile(self.game, tp, self.pos_x, self.pos_y, borders[i][1])
 
 
 class RoadParkingTile(RoadTile):
@@ -182,7 +206,7 @@ class CarPlayer(Car):
         self.running = False
 
     def go(self):
-        sp_add = self.speed_add / self.game.fps
+        sp_add = self.speed_add * 60 / (self.game.fps ** 2)
         sp_add = self.game._coord((sp_add, None))[0]
         if self.direction == self.TOP_LEFT:
             self.dx -= sp_add
@@ -226,22 +250,49 @@ class Board:
         self.player = self.generate_level()
         self.cell_size = Game.CELL_SIZE
 
+    def get(self, row, col):
+        if not (0 <= row < self.height):
+            return '.'
+        if not (0 <= col < self.width):
+            return '.'
+        return self.board[row][col]
+
     def generate_level(self):
         free_cells = []
         for y in range(self.height):
             for x in range(self.width):
-                if self.board[y][x] == '#':
+                if self.get(y, x) == '#':
                     BuildTile(self.game, 'build_1', x, y)
-                elif self.board[y][x] == '.':
+                elif self.get(y, x) == '.':
                     BackTile(self.game, None, x, y)
                 else:
+                    no_roads = '#X.'
+                    no_roads_and_visible = '.'
+                    borders = [
+                        (
+                            self.get(y - 1, x) in no_roads,
+                            self.get(y - 1, x) in no_roads_and_visible
+                        ),
+                        (
+                            self.get(y + 1, x + 1) in no_roads,
+                            self.get(y + 1, x + 1) in no_roads_and_visible
+                        ),
+                        (
+                            self.get(y + 1, x) in no_roads,
+                            self.get(y + 1, x) in no_roads_and_visible
+                        ),
+                        (
+                            self.get(y - 1, x - 1) in no_roads,
+                            self.get(y - 1, x - 1) in no_roads_and_visible
+                        ),
+                    ]
                     free_cells.append((x, y))
-                    if self.board[y][x] == ' ':
-                        RoadTile(self.game, None, x, y)
-                    elif self.board[y][x] == 'П':
-                        RoadParkingTile(self.game, None, x, y)
-                    elif self.board[y][x] == '*':
-                        RoadAroundBuildingTile(self.game, None, x, y)
+                    if self.get(y, x) == ' ':
+                        RoadTile(self.game, None, x, y).add_borders(borders)
+                    elif self.get(y, x) == 'П':
+                        RoadParkingTile(self.game, None, x, y).add_borders(borders)
+                    elif self.get(y, x) == '*':
+                        RoadAroundBuildingTile(self.game, None, x, y).add_borders(borders)
         new_player = CarPlayer(self.game, *free_cells[0])
         return new_player
 
@@ -282,6 +333,19 @@ def load_tiles(Game):
                                                  -1, Game._coord((Game.CELL_SIZE[0], None)), False)
     Game.tile_images['road_1'] = Game.load_image(r'images\tiles\road\1.png',
                                                  -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['border_bottom_left'] = Game.load_image(
+        r'images\tiles\borders\bottom_left.png',
+        -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['border_bottom_right'] = Game.load_image(
+        r'images\tiles\borders\bottom_right.png',
+        -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['border_top_left'] = Game.load_image(
+        r'images\tiles\borders\top_left.png',
+        -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['border_top_right'] = Game.load_image(
+        r'images\tiles\borders\top_right.png',
+        -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+
 
 
 def game(Game):
@@ -290,6 +354,11 @@ def game(Game):
     load_tiles(Game)
     Game.all_sprites.empty()
     Game.rel_sprites.empty()
+    Game.cars_sprites.empty()
+    Game.border_top_left_sprites.empty()
+    Game.border_top_right_sprites.empty()
+    Game.border_bottom_left_sprites.empty()
+    Game.border_bottom_right_sprites.empty()
     Game.level = Game.get_level()
     Game.board = Board(Game)
     player1 = Game.board.player

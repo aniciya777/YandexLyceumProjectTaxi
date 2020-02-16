@@ -12,6 +12,10 @@ class Game(SETTINGS, Functions):
     all_sprites = pygame.sprite.Group()
     rel_sprites = pygame.sprite.Group()
     cars_sprites = pygame.sprite.Group()
+    border_top_left_sprites = pygame.sprite.Group()
+    border_top_right_sprites = pygame.sprite.Group()
+    border_bottom_left_sprites = pygame.sprite.Group()
+    border_bottom_right_sprites = pygame.sprite.Group()
     callbacks = []
     tile_images = {}
 
