@@ -27,7 +27,7 @@ class Functions:
                 colorkey = image.get_at((0, 0))
             image.set_colorkey(colorkey)
         else:
-            image = image.convert_alpha()
+            image = image.convert()
         if size:
             rect = image.get_rect()
             size = list(size)

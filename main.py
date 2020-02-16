@@ -19,6 +19,7 @@ class Game(SETTINGS, Functions):
     callbacks = []
     tile_images = {}
 
+
 try:
     os.environ['SDL_VIDEO_CENTERED'] = '1'
     pygame.init()

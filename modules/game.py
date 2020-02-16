@@ -67,6 +67,18 @@ class BackTile(Tile):
 class BuildTile(BackTile):
     def __init__(self, Game, tile_type, pos_x, pos_y):
         super().__init__(Game, tile_type, pos_x, pos_y)
+        self.image_orig = self.image.convert()
+        colorkey = self.image_orig.get_at((0, 0))
+        self.image_orig.set_colorkey(colorkey)
+        self.image_alpha = self.image.convert()
+        self.image_alpha.set_colorkey(colorkey)
+        self.image_alpha.set_alpha(100)
+
+    def update(self, *args):
+        if pygame.sprite.collide_mask(self, self.game.board.player):
+            self.image = self.image_alpha
+        else:
+            self.image = self.image_orig
 
 
 class RoadTile(Tile):
@@ -376,7 +388,6 @@ def load_tiles(Game):
     Game.tile_images['border_top_right'] = Game.load_image(
         r'images\tiles\borders\top_right.png',
         -1, Game._coord((Game.CELL_SIZE[0], None)), False)
-
 
 
 def game(Game):
