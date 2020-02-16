@@ -1,3 +1,6 @@
+import json
+
+
 class SETTINGS:
     STATUS_CONTEST = 0
     STATUS_FREE = 1
@@ -23,3 +26,12 @@ class SETTINGS:
     real_width = width
     real_height = height
     fps_real = fps
+
+try:
+    config = json.load(open('data/config.json'))
+    SETTINGS.status = config['status']
+    SETTINGS.firm = config['firm']
+    SETTINGS.fps = config['fps']
+    SETTINGS.fullscrean = config['fullscreen'] == 'on'
+except Exception:
+    pass

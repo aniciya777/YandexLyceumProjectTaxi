@@ -1,12 +1,21 @@
 import os
 import pygame
 import numpy
+import json
 from win32api import GetSystemMetrics
 
 class Functions:
-    @staticmethod
-    def quit(*args):
+    @classmethod
+    def quit(cls, *args):
         pygame.quit()
+        config = {
+            'status': cls.status,
+            'firm': cls.firm,
+            'fps': cls.fps,
+            'fullscreen': 'on' if cls.fullscrean else 'off'
+        }
+        with open('data/config.json', 'w') as file:
+            file.write(json.dumps(config))
         exit(0)
 
     @staticmethod
@@ -115,3 +124,5 @@ class Functions:
             cls.screen = pygame.display.set_mode(cls.size(), flags=pygame.FULLSCREEN)
         else:
             cls.screen = pygame.display.set_mode((cls.width, cls.height))
+            cls.real_width = cls.width
+            cls.real_height = cls.height

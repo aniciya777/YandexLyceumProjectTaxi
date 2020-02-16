@@ -15,10 +15,12 @@ class Game(SETTINGS, Functions):
     callbacks = []
     tile_images = {}
 
-
-os.environ['SDL_VIDEO_CENTERED'] = '1'
-pygame.init()
-loader(Game)
-Game.set_mode()
-pygame.display.set_caption('ГоняйТакси')
-menu(Game)
+try:
+    os.environ['SDL_VIDEO_CENTERED'] = '1'
+    pygame.init()
+    loader(Game)
+    Game.set_mode()
+    pygame.display.set_caption('ГоняйТакси')
+    menu(Game)
+except SystemExit:
+    Game.quit()
