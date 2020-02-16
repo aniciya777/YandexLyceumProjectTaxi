@@ -86,6 +86,14 @@ class BuildTile(BackTile):
             self.image = self.image_orig
 
 
+class TreeTile(BuildTile):
+    def __init__(self, Game, tile_type, pos_x, pos_y):
+        if tile_type is None:
+            tile_type = random.choice(['tree_1', 'tree_2', 'tree_3', 'tree_4', 'tree_5',
+                                       'tree_6', 'tree_7', 'tree_8', 'tree_9', 'tree_10'])
+        super().__init__(Game, tile_type, pos_x, pos_y)
+
+
 class RoadTile(Tile):
     def __init__(self, Game, tile_type, pos_x, pos_y):
         if tile_type is None:
@@ -313,7 +321,7 @@ class Board:
                 elif self.get(y, x) == '.':
                     BackTile(self.game, None, x, y)
                 elif self.get(y, x) == 'X':
-                    pass
+                    TreeTile(self.game, None, x, y)
                 else:
                     no_roads = '#X.'
                     no_roads_and_visible = '.X'
@@ -398,6 +406,26 @@ def load_tiles(Game):
     Game.tile_images['border_top_right'] = Game.load_image(
         r'images\tiles\borders\top_right.png',
         -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_1'] = Game.load_image(r'images\tiles\trees\1.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_2'] = Game.load_image(r'images\tiles\trees\2.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_3'] = Game.load_image(r'images\tiles\trees\3.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_4'] = Game.load_image(r'images\tiles\trees\4.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_5'] = Game.load_image(r'images\tiles\trees\5.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_6'] = Game.load_image(r'images\tiles\trees\6.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_7'] = Game.load_image(r'images\tiles\trees\7.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_8'] = Game.load_image(r'images\tiles\trees\8.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_9'] = Game.load_image(r'images\tiles\trees\9.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
+    Game.tile_images['tree_10'] = Game.load_image(r'images\tiles\trees\10.png',
+                                                 -1, Game._coord((Game.CELL_SIZE[0], None)), False)
 
 
 def game(Game):
