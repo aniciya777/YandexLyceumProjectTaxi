@@ -2,6 +2,7 @@ import os
 import pygame
 import numpy
 import json
+import random
 from win32api import GetSystemMetrics
 
 class Functions:
@@ -103,7 +104,7 @@ class Functions:
 
     @classmethod
     def get_level(cls):
-        return 2
+        return random.randint(1, 2)
 
     @staticmethod
     def load_level(filename):

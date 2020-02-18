@@ -11,7 +11,7 @@ class SETTINGS:
         'Maxim'
     ]
     FPS_COEFF = 0.05
-    CELL_SIZE = 20
+    CELL_SIZE = 100
     CELL_SIZE = (CELL_SIZE, CELL_SIZE * 0.5)
 
     width = 600
