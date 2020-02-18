@@ -461,7 +461,7 @@ def game(Game):
         fps_label.print(str(round(Game.fps_real)), 15).move(5, 380)
         Game.update(event)
         # изменяем ракурс камеры
-        camera.update(Game.board.player);
+        camera.update(Game.board.player)
         # обновляем положение всех спрайтов
         for sprite in Game.rel_sprites:
             camera.apply(sprite)
