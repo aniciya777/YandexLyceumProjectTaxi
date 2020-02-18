@@ -126,7 +126,7 @@ class Car(pygame.sprite.Sprite):
     TOP_RIGHT = 8
     BOTTOM_LEFT = 0
     BOTTOM_RIGHT = 12
-    SPEED_COEFF = 0.2
+    SPEED_COEFF = 0.01
     SPEED_ADD = 0.05
 
     def __init__(self, Game, firm, pos_x, pos_y):
@@ -252,10 +252,11 @@ class CarPlayer(Car):
             self.dy += sp_add / 2
 
     def update(self, *args):
-        self.dx *= self.SPEED_COEFF ** (1 / self.game.fps)
-        self.dy *= self.SPEED_COEFF ** (1 / self.game.fps)
         if self.running:
             self.go()
+        else:
+            self.dx *= self.SPEED_COEFF ** (1 / self.game.fps)
+            self.dy *= self.SPEED_COEFF ** (1 / self.game.fps)
         if pygame.sprite.spritecollide(self, self.game.border_top_left_sprites,
                                        False, pygame.sprite.collide_mask):
             if self.dy < 0:

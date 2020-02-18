@@ -103,7 +103,7 @@ class Functions:
 
     @classmethod
     def get_level(cls):
-        return 1
+        return 2
 
     @staticmethod
     def load_level(filename):
